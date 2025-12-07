@@ -34,38 +34,87 @@ void finalize(QUEUE* q)
 // valの値をキューに入れる。実行の成否を返す
 bool enqueue(QUEUE* q, int val)
 {
-	// ToDo: valのデータをキューに追加します
-	// 上手くいかない場合にはfalseを返します
-	// メモリを使い切ったら先頭アドレスに戻って追加して下さい
+	if (q == NULL || q->memory_begin == NULL) {
+		return false;
+	}
 
-	return false;
+	if (countQueueableElements(q) <= 0) {
+		return false;
+	}
+	
+	*q->head = val;
+	q->head++;
+	if (q->head >= q->memory_end) {
+		q->head = q->memory_begin;
+	}
+
+	return true;
 }
 
 
 // addrから始まるnum個の整数をキューに入れる。実行の成否を返す
 bool enqueue_array(QUEUE* q, int* addr, int num)
 {
-	// ToDo: addrからnum個のデータをキューに追加します
-	// 上手くいかない場合にはfalseを返します
-	// メモリを使い切ったら先頭アドレスに戻って追加して下さい
+	if (q == NULL || q->memory_begin == NULL || addr == NULL) {
+		return false;
+	}
 
-	return false;
+	if (num <= 0) {
+		return false;
+	}
+
+	if (countQueueableElements(q) < num) {
+		return false;
+	}
+
+	for (int i = 0; i < num; ++i) {
+		if (!enqueue(q, addr[i])) {
+			return false;
+		}
+	}
+
+	return true;
 }
 
 // キューから一つの要素を取り出す(不具合時は0を返す)
 int dequeue(QUEUE* q)
 {
-	// ToDo: 先頭のデータを返します
+	if (q == NULL || q->memory_begin == NULL) {
+		return 0;
+	}
 
-	return 0;
+	if (isEmpty(q)) {
+		return 0;
+	}
+
+	int value = *q->tail;
+
+	q->tail++;
+	if (q->tail >= q->memory_end) {
+		q->tail = q->memory_begin;
+	}
+
+	return value;
 }
 
 // addrにキューからnumの要素を取り出す。取り出せた個数を返す
 int dequeue_array(QUEUE* q, int* addr, int num)
 {
-	// ToDo: 先頭からnum個のデータをaddrに格納します
+	if (q == NULL || q->memory_begin == NULL || addr == NULL) {
+		return 0;
+	}
+	if (num <= 0) {
+		return 0;
+	}
 
-	return 0;
+	int available = countQueuedElements(q);
+	int toRead = (available < num) ? available : num;
+
+	for (int i = 0; i < toRead; ++i) {
+		addr[i] = dequeue(q);
+	}
+
+	return toRead;
 }
 
 // キューが空かどうかを調べる
